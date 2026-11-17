@@ -1,0 +1,13 @@
+{
+  "contest_id": "meshcore-1000-20261122",
+  "files": {
+    "RELEASE.json": "41e835d8d9d99d006fec221f8e01ee57a5afe6630dd464185dcb01a74494c78d",
+    "result.json": "e6d9b872bcfe9289010e4a1e5e9f453f9fd2870cecae7ed80e998032609e9f1f",
+    "verification.json": "38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed"
+  },
+  "phase": "OPEN",
+  "prepared_at": "2026-11-16T22:07:39Z",
+  "revision": 1,
+  "schema_version": "meshdraw-show-status-v1",
+  "snapshot_at": "2026-11-16T22:05:34Z"
+}
