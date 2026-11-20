@@ -49,6 +49,24 @@ export function validateAnnouncement(data) {
   return {cutoff, ceremony};
 }
 
+export function announcementClock(state, {cutoff, ceremony} = {}, now = Date.now()) {
+  if (!state || state.archive_plan
+      || !['OPEN', 'CLOSING', 'CLOSED', 'DRAINED'].includes(state.phase)
+      || !Number.isFinite(+cutoff) || !Number.isFinite(+ceremony) || +cutoff >= +ceremony
+      || Date.parse(state.cutoff_at) !== +cutoff
+      || !Number.isFinite(Date.parse(state.opens_at)) || !Number.isFinite(Date.parse(state.snapshot_at))) return null;
+  if (!Number.isFinite(now) || now < Date.parse(state.snapshot_at)) {
+    return {label: 'Проверьте дату и время на устройстве', seconds: null};
+  }
+  if (now < Date.parse(state.opens_at)) return null;
+  if (now >= +ceremony) return {label: 'Ожидаем опубликованного проверенного результата', seconds: null};
+  const registering = state.phase === 'OPEN' && now < +cutoff;
+  return {
+    label: registering ? 'До окончания приёма заявок' : 'До запланированного подведения итогов',
+    seconds: Math.ceil(((registering ? +cutoff : +ceremony) - now) / 1000),
+  };
+}
+
 const dateOptions = {day: 'numeric', month: 'long', timeZone: 'Europe/Moscow'};
 const moscowDate = new Intl.DateTimeFormat('ru-RU', dateOptions);
 const moscowTime = new Intl.DateTimeFormat('ru-RU', {
@@ -128,11 +146,23 @@ export async function mountAnnouncement() {
     render(state, phaseLabel, now = Date.now(), stale = false) {
       const open = state?.phase === 'OPEN' && now >= Date.parse(state.opens_at) && now < +cutoff;
       const registration = state?.registered_accounts;
-      const status = state ? (open ? data.open_status : phaseLabel)
+      const status = state ? (open ? data.open_status
+        : state.phase === 'OPEN' && now >= +cutoff ? data.closed_status : phaseLabel)
         : now >= +cutoff ? data.closed_status : 'Ожидаем официальный снимок регистрации';
       const statusNode = byId('announcement-status');
       if (statusNode.textContent !== status) statusNode.textContent = status;
       statusNode.dataset.tone = state?.phase === 'DRAW_FAILED' ? 'error' : open ? 'open' : 'pending';
+
+      const clock = announcementClock(state, {cutoff, ceremony}, now);
+      byId('announcement-clock').hidden = !clock;
+      const countdown = byId('announcement-countdown');
+      countdown.hidden = clock?.seconds == null;
+      const seconds = clock?.seconds;
+      const parts = [Math.floor(seconds / 3600), Math.floor(seconds / 60) % 60, seconds % 60];
+      const clockText = seconds == null ? '' : parts.map(part => String(part).padStart(2, '0')).join(':');
+      if (countdown.textContent !== clockText) countdown.textContent = clockText;
+      const clockLabel = byId('announcement-clock-label');
+      if (clockLabel.textContent !== clock?.label) clockLabel.textContent = clock?.label ?? '';
 
       const cta = byId('announcement-cta');
       const ctaText = open ? data.cta : 'Открыть пост розыгрыша';

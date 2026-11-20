@@ -188,6 +188,21 @@
 }
 .announcement-dates dt { color:#c7ddca; }
 .announcement-dates dd { font-size:.96rem; font-weight:650; }
+.announcement-clock {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:baseline;
+  gap:.15rem .9rem;
+  margin-top:.85rem;
+}
+.announcement-hero .announcement-clock-label { flex:1 1 15rem; font-size:.9rem; line-height:1.4; }
+.announcement-hero .announcement-countdown {
+  color:#f6f7e9;
+  font:650 clamp(1.75rem,2.5vw,2.15rem)/1.2 system-ui,sans-serif;
+  font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+}
+.announcement-hero .announcement-clock-note { flex-basis:100%; font-size:.8rem; }
 .announcement-actions {
   display:flex;
   flex-wrap:wrap;

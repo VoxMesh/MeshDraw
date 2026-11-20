@@ -317,7 +317,7 @@ function render(state, previous, verified) {
   renderTickets(state, previous);
   clearInterval(countdownTimer);
   renderClock();
-  if (state.phase === 'OPEN' || state.phase === 'FROZEN' || state.phase === 'WAITING') {
+  if (['OPEN', 'CLOSING', 'CLOSED', 'DRAINED', 'FROZEN', 'WAITING'].includes(state.phase)) {
     countdownTimer = setInterval(renderClock, 1000);
   }
   if (locked) {
