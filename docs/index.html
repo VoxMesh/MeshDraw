@@ -34,20 +34,21 @@
         <span id="announcement-title-channel-line" class="announcement-title-channel" hidden>канала „<a id="announcement-title-channel" rel="noreferrer"></a>“</span>
       </h1>
       <p id="prelaunch-summary">Сведения о конкурсе пока недоступны.</p>
-      <div class="announcement-hero" id="announcement-content" hidden>
+      <div class="announcement-hero" id="announcement-content" data-registration-closed="true" hidden>
         <div id="announcement-copy" class="announcement-copy">
           <p class="status announcement-status" id="announcement-status" role="status"></p>
           <p class="announcement-prize"><strong id="announcement-prize-title"></strong></p>
           <dl class="announcement-dates">
             <div>
-              <dt>Приём заявок до</dt>
-              <dd><time id="announcement-cutoff"></time></dd>
+              <dt>Приём заявок</dt>
+              <dd><strong>Завершён</strong><time id="announcement-cutoff"></time></dd>
             </div>
             <div>
               <dt>Подведение итогов</dt>
               <dd><time id="announcement-ceremony"></time></dd>
             </div>
           </dl>
+          <p id="announcement-preparation" class="announcement-preparation" role="status" hidden>Идёт проверка заявок и подготовка списка билетов</p>
           <div id="announcement-clock" class="announcement-clock" hidden>
             <p id="announcement-clock-label" class="announcement-clock-label" role="status"></p>
             <p id="announcement-countdown" class="announcement-countdown" role="timer" aria-live="off" aria-labelledby="announcement-clock-label" aria-describedby="announcement-clock-note" hidden></p>
@@ -65,7 +66,7 @@
       </div>
       <div id="announcement-registration" class="announcement-registration" hidden>
         <div>
-          <p id="announcement-meta">Официальный снимок регистрации пока недоступен.</p>
+          <p id="announcement-meta" data-preliminary-count="102" data-preliminary-at="2026-11-21T19:17:56Z">Официальный снимок регистрации пока недоступен.</p>
           <p id="announcement-updated" class="muted" hidden>Обновлено <time id="announcement-snapshot"></time></p>
           <p id="announcement-stale" class="muted" hidden>После этого снимка число заявок могло измениться.</p>
         </div>
@@ -167,8 +168,6 @@
     <section id="announcement-rules" class="announcement-rules" aria-labelledby="announcement-rules-title" hidden>
       <h2 id="announcement-rules-title">Условия участия</h2>
       <div>
-        <p id="announcement-participation"></p>
-        <ul id="announcement-conditions"></ul>
         <p><a id="announcement-full-rules" rel="noreferrer"></a></p>
       </div>
     </section>

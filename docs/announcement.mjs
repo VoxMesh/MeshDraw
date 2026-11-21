@@ -49,7 +49,7 @@ export function validateAnnouncement(data) {
   return {cutoff, ceremony};
 }
 
-export function announcementClock(state, {cutoff, ceremony} = {}, now = Date.now()) {
+export function announcementClock(state, {cutoff, ceremony, registrationClosed = false} = {}, now = Date.now()) {
   if (!state || state.archive_plan
       || !['OPEN', 'CLOSING', 'CLOSED', 'DRAINED'].includes(state.phase)
       || !Number.isFinite(+cutoff) || !Number.isFinite(+ceremony) || +cutoff >= +ceremony
@@ -60,7 +60,7 @@ export function announcementClock(state, {cutoff, ceremony} = {}, now = Date.now
   }
   if (now < Date.parse(state.opens_at)) return null;
   if (now >= +ceremony) return {label: 'Ожидаем опубликованного проверенного результата', seconds: null};
-  const registering = state.phase === 'OPEN' && now < +cutoff;
+  const registering = !registrationClosed && state.phase === 'OPEN' && now < +cutoff;
   return {
     label: registering ? 'До окончания приёма заявок' : 'До запланированного подведения итогов',
     seconds: Math.ceil(((registering ? +cutoff : +ceremony) - now) / 1000),
@@ -89,20 +89,6 @@ function setLink(id, label, href) {
   link.href = href;
 }
 
-function setLinkedText(element, text, link) {
-  const label = link.textContent;
-  const position = text.indexOf(label);
-  if (position === -1) {
-    element.textContent = text;
-    return;
-  }
-  const inlineLink = document.createElement('a');
-  inlineLink.href = link.href;
-  inlineLink.rel = link.rel;
-  inlineLink.textContent = label;
-  element.replaceChildren(text.slice(0, position), inlineLink, text.slice(position + label.length));
-}
-
 export async function mountAnnouncement() {
   const response = await fetch(new URL('./announcement.json', import.meta.url), {
     cache: 'no-cache', credentials: 'omit', redirect: 'error', signal: AbortSignal.timeout(8000),
@@ -110,6 +96,13 @@ export async function mountAnnouncement() {
   if (!response.ok) throw new Error('ANNOUNCEMENT_UNAVAILABLE');
   const data = parsePackageText(await response.text());
   const {cutoff, ceremony} = validateAnnouncement(data);
+  const registrationClosed = byId('announcement-content').dataset.registrationClosed === 'true';
+  const count = byId('announcement-meta');
+  const preliminaryCount = Number(count.dataset.preliminaryCount);
+  const preliminaryAt = count.dataset.preliminaryAt;
+  const preliminaryValid = Number.isSafeInteger(preliminaryCount) && preliminaryCount >= 0
+    && typeof preliminaryAt === 'string' && Number.isFinite(Date.parse(preliminaryAt))
+    && Date.parse(preliminaryAt) >= +cutoff;
   const heading = byId('prelaunch-heading');
   byId('announcement-title').textContent = data.title;
   const channelUrl = new URL('.', data.post_url).href.slice(0, -1);
@@ -120,17 +113,11 @@ export async function mountAnnouncement() {
   byId('prelaunch-summary').hidden = true;
   byId('announcement-prize-title').textContent = data.prize;
   byId('announcement-sponsor').textContent = data.sponsor;
-  setLinkedText(byId('announcement-participation'), data.participation, byId('announcement-title-channel'));
   setTime('announcement-cutoff', cutoff);
   setTime('announcement-ceremony', ceremony);
   setLink('announcement-cta', data.cta, data.post_url);
   setLink('announcement-rules-link', data.rules_label, data.rules_url);
   setLink('announcement-full-rules', 'Полные правила в Telegram', data.rules_url);
-  byId('announcement-conditions').replaceChildren(...data.conditions.map(text => {
-    const item = document.createElement('li');
-    setLinkedText(item, text, byId('announcement-sponsor-link'));
-    return item;
-  }));
   if (data.prize_image) {
     const image = byId('announcement-prize-image');
     const {src, alt, width, height} = data.prize_image;
@@ -144,16 +131,19 @@ export async function mountAnnouncement() {
   return {
     matches: state => !state || Date.parse(state.cutoff_at) === +cutoff,
     render(state, phaseLabel, now = Date.now(), stale = false) {
-      const open = state?.phase === 'OPEN' && now >= Date.parse(state.opens_at) && now < +cutoff;
+      const locked = state?.archive_plan != null;
+      const open = !registrationClosed && state?.phase === 'OPEN' && now >= Date.parse(state.opens_at) && now < +cutoff;
       const registration = state?.registered_accounts;
       const status = state ? (open ? data.open_status
         : state.phase === 'OPEN' && now >= +cutoff ? data.closed_status : phaseLabel)
         : now >= +cutoff ? data.closed_status : 'Ожидаем официальный снимок регистрации';
       const statusNode = byId('announcement-status');
+      statusNode.hidden = registrationClosed && !locked;
+      byId('announcement-preparation').hidden = !registrationClosed || !state || locked;
       if (statusNode.textContent !== status) statusNode.textContent = status;
       statusNode.dataset.tone = state?.phase === 'DRAW_FAILED' ? 'error' : open ? 'open' : 'pending';
 
-      const clock = announcementClock(state, {cutoff, ceremony}, now);
+      const clock = announcementClock(state, {cutoff, ceremony, registrationClosed}, now);
       byId('announcement-clock').hidden = !clock;
       const countdown = byId('announcement-countdown');
       countdown.hidden = clock?.seconds == null;
@@ -168,20 +158,22 @@ export async function mountAnnouncement() {
       const ctaText = open ? data.cta : 'Открыть пост розыгрыша';
       if (cta.textContent !== ctaText) cta.textContent = ctaText;
       cta.hidden = !open && (Boolean(state) || now >= +cutoff);
-      const locked = state?.archive_plan != null;
       byId('announcement-content').toggleAttribute('data-locked', locked);
       byId('announcement-registration').hidden = locked;
-      const countText = registration == null ? 'Число зарегистрированных аккаунтов пока недоступно.'
+      const preliminary = registrationClosed && !locked && registration != null && preliminaryValid
+        && Date.parse(state.snapshot_at) < Date.parse(preliminaryAt) && preliminaryCount >= registration;
+      const countText = preliminary ? 'Предварительно зарегистрировано: ' + integer.format(preliminaryCount) + ' аккаунта'
+        : registration == null ? 'Число зарегистрированных аккаунтов пока недоступно.'
         : 'Зарегистрировано аккаунтов: ' + integer.format(registration);
-      const count = byId('announcement-meta');
       if (count.textContent !== countText) count.textContent = countText;
       byId('announcement-updated').hidden = registration == null;
-      byId('announcement-stale').hidden = !stale;
+      byId('announcement-stale').hidden = preliminary || !stale;
       if (registration != null) {
         const snapshot = byId('announcement-snapshot');
-        if (snapshot.dateTime !== state.snapshot_at) {
-          snapshot.dateTime = state.snapshot_at;
-          snapshot.textContent = moscowSnapshot.format(new Date(state.snapshot_at)) + ' МСК';
+        const snapshotAt = preliminary ? preliminaryAt : state.snapshot_at;
+        if (snapshot.dateTime !== snapshotAt) {
+          snapshot.dateTime = snapshotAt;
+          snapshot.textContent = moscowSnapshot.format(new Date(snapshotAt)) + ' МСК';
         }
       }
     },

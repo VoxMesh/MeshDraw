@@ -188,6 +188,8 @@
 }
 .announcement-dates dt { color:#c7ddca; }
 .announcement-dates dd { font-size:.96rem; font-weight:650; }
+.announcement-dates strong { display:block; }
+.announcement-hero .announcement-preparation { margin-top:.85rem; }
 .announcement-clock {
   display:flex;
   flex-wrap:wrap;

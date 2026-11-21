@@ -116,3 +116,22 @@ test('announcement clock uses the supplied schedule rather than fixed calendar d
     label: 'До запланированного подведения итогов', seconds: 86_277,
   });
 });
+
+test('confirmed registration closure changes the display without changing the public phase', () => {
+  const original = structuredClone(clockState);
+  const schedule = {...clockSchedule, registrationClosed: true};
+  const now = +clockSchedule.cutoff - 1_000;
+  assert.deepEqual(announcementClock(clockState, schedule, now), {
+    label: 'До запланированного подведения итогов', seconds: 82_801,
+  });
+  assert.deepEqual(announcementClock(clockState, clockSchedule, now), {
+    label: 'До окончания приёма заявок', seconds: 1,
+  });
+  for (const time of [+clockSchedule.ceremony, +clockSchedule.ceremony + 5_000]) {
+    assert.deepEqual(announcementClock(clockState, schedule, time), {
+      label: 'Ожидаем опубликованного проверенного результата', seconds: null,
+    });
+  }
+  assert.equal(announcementClock({...clockState, phase: 'FROZEN', archive_plan: {}}, schedule, now), null);
+  assert.deepEqual(clockState, original);
+});
