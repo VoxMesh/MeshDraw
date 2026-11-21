@@ -292,11 +292,14 @@ function parentKey(row) {
 
 export function checkSnapshot(snapshot) {
   fields(snapshot, ['schema_version', 'complete', 'reported_total', 'rows', 'request_offsets'], 'SNAPSHOT_FIELDS');
-  if (snapshot.schema_version !== 'meshdraw-source-snapshot-v1' || snapshot.complete !== true) fail('INCOMPLETE_SNAPSHOT');
+  const single = snapshot.schema_version === 'meshdraw-source-snapshot-v2';
+  if ((!single && snapshot.schema_version !== 'meshdraw-source-snapshot-v1') || snapshot.complete !== true) fail('INCOMPLETE_SNAPSHOT');
   integer(snapshot.reported_total, 0, 200);
   const offsets = snapshot.request_offsets;
   if (!Array.isArray(offsets) || offsets.length < 1 || offsets.length > 4) fail('PAGE_METADATA');
   offsets.forEach(offset => integer(offset, 0, 200));
+  if (single && (offsets.length !== 1 || offsets[0] !== 0)) fail('SINGLE_REQUEST_OFFSET');
+  const pageLimit = single ? 200 : 100;
   if (new Set(offsets).size !== offsets.length) fail('DUPLICATE_OFFSET');
   if (!Array.isArray(snapshot.rows) || snapshot.rows.length > 3000) fail('RECORD_LIMIT');
   const seen = new Set(), parents = new Map(), children = [];
@@ -335,8 +338,8 @@ export function checkSnapshot(snapshot) {
   for (const [page, offset] of [...offsets].sort((a, b) => a - b).entries()) {
     if (offset !== expected) fail('PAGE_OFFSET_GAP');
     const count = [...parents.values()].filter(row => row.page === page).length;
-    if (count !== Math.min(100, snapshot.reported_total - offset)) fail('SHORT_STUDY_PAGE');
-    if (count > 100 || count === 0 && snapshot.reported_total > 0) fail('PAGE_PARENT_COUNT');
+    if (count !== Math.min(pageLimit, snapshot.reported_total - offset)) fail('SHORT_STUDY_PAGE');
+    if (count > pageLimit || count === 0 && snapshot.reported_total > 0) fail('PAGE_PARENT_COUNT');
     expected += count;
   }
   if (expected !== snapshot.reported_total || snapshot.rows.some(row => row.page >= offsets.length)) fail('PAGE_RECORDS_MISSING');

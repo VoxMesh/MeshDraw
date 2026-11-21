@@ -6,6 +6,10 @@ import re
 from . import math as mathcore
 from . import normalization as norm
 
+LEGACY_SNAPSHOT_SCHEMA = 'meshdraw-source-snapshot-v1'
+SINGLE_SNAPSHOT_SCHEMA = 'meshdraw-source-snapshot-v2'
+SINGLE_REQUEST_LIMIT = 200
+
 class Invalid(ValueError):
     pass
 
@@ -65,10 +69,15 @@ def check_rows(rows,max_rows=2048):
     return parents,children
 def check_snapshot(s,max_rows=2048,page_limit=50):
     exact_fields(s,{'schema_version','complete','reported_total','rows','request_offsets'},'SNAPSHOT_FIELDS')
-    if s['schema_version']!='meshdraw-source-snapshot-v1' or s['complete'] is not True:fail('INCOMPLETE_SNAPSHOT')
+    schema=s['schema_version']
+    if schema not in (LEGACY_SNAPSHOT_SCHEMA,SINGLE_SNAPSHOT_SCHEMA) or s['complete'] is not True:fail('INCOMPLETE_SNAPSHOT')
+    single=schema==SINGLE_SNAPSHOT_SCHEMA
     integer(s['reported_total'],0,200)
     if type(s['request_offsets']) is not list or not 1<=len(s['request_offsets'])<=4:fail('PAGE_METADATA')
     for x in s['request_offsets']:integer(x,0,200)
+    if single:
+        if s['request_offsets']!=[0]:fail('SINGLE_REQUEST_OFFSET')
+        page_limit=SINGLE_REQUEST_LIMIT
     if len(s['request_offsets'])!=len(set(s['request_offsets'])):fail('DUPLICATE_OFFSET')
     parents,children=check_rows(s['rows'],max_rows)
     if len(parents)!=s['reported_total']:fail('INCOMPLETE_PARENT_TOTAL')
@@ -76,7 +85,7 @@ def check_snapshot(s,max_rows=2048,page_limit=50):
     for page,offset in enumerate(offsets):
         if offset!=expected:fail('PAGE_OFFSET_GAP')
         count=sum(r['page']==page for r in parents.values())
-        if page_limit==100 and count!=min(100,s['reported_total']-offset):fail('SHORT_STUDY_PAGE')
+        if (single or page_limit==100) and count!=min(page_limit,s['reported_total']-offset):fail('SHORT_STUDY_PAGE')
         if count>page_limit or (not count and s['reported_total']>0):fail('PAGE_PARENT_COUNT')
         expected+=count
     if expected!=s['reported_total'] or any(r['page']>=len(offsets) for r in s['rows']):fail('PAGE_RECORDS_MISSING')
