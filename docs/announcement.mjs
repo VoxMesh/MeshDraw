@@ -138,7 +138,7 @@ export async function mountAnnouncement() {
         : state.phase === 'OPEN' && now >= +cutoff ? data.closed_status : phaseLabel)
         : now >= +cutoff ? data.closed_status : 'Ожидаем официальный снимок регистрации';
       const statusNode = byId('announcement-status');
-      statusNode.hidden = registrationClosed && !locked;
+      statusNode.hidden = (registrationClosed && !locked) || state?.phase === 'FROZEN';
       byId('announcement-preparation').hidden = !registrationClosed || !state || locked;
       if (statusNode.textContent !== status) statusNode.textContent = status;
       statusNode.dataset.tone = state?.phase === 'DRAW_FAILED' ? 'error' : open ? 'open' : 'pending';

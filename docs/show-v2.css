@@ -266,7 +266,8 @@
 .announcement-rules li + li { margin-top:.4rem; }
 .announcement-rules ul + p { margin-top:.65rem; font-weight:650; }
 .announcement-hero[data-locked] {
-  display:block;
+  display:grid;
+  grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);
   padding:0 0 1rem;
   border-bottom:1px solid var(--line);
   border-radius:0;
@@ -274,31 +275,25 @@
   color:var(--ink);
 }
 .announcement-hero[data-locked] .announcement-copy {
-  display:grid;
-  grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);
-  grid-template-areas:"title dates" "status dates" "prize links";
-  column-gap:clamp(1rem,4vw,3rem);
-  align-items:start;
+  display:block;
 }
 .announcement-hero[data-locked] h1 {
-  grid-area:title;
   max-width:none;
   font-size:clamp(1.6rem,2.5vw,2.35rem);
   text-wrap:wrap;
 }
-.announcement-hero[data-locked] .announcement-status { grid-area:status; margin-top:.45rem; color:var(--accent); }
+.announcement-hero[data-locked] .announcement-status { margin-top:.45rem; color:var(--accent); }
 .announcement-hero[data-locked] .announcement-status[data-tone="error"] { color:var(--error); }
-.announcement-hero[data-locked] .announcement-prize { grid-area:prize; color:var(--ink); font-size:1.1rem; }
-.announcement-hero[data-locked] .announcement-actions { grid-area:links; margin:0; }
+.announcement-hero[data-locked] .announcement-prize { color:var(--ink); font-size:1.1rem; }
+.announcement-hero[data-locked] .announcement-actions { margin-top:.65rem; }
 .announcement-hero[data-locked] a { color:var(--accent); }
 .announcement-hero[data-locked] a:focus-visible { outline-color:var(--focus); }
 .announcement-hero[data-locked] .announcement-dates {
-  grid-area:dates;
-  margin:0;
+  margin:.8rem 0 0;
   border-color:var(--line);
 }
 .announcement-hero[data-locked] dt { color:var(--muted); }
-.announcement-hero[data-locked] .announcement-media { display:none; }
+.announcement-hero[data-locked] .announcement-sponsor { color:var(--ink); }
 .method { margin-top:clamp(2rem,4vw,3.25rem); padding-top:1.25rem; border-top:1px solid var(--line); }
 .method-intro { max-width:68ch; }
 .method h3 { margin:1.3rem 0 .4rem; }
@@ -325,7 +320,7 @@
   .announcement-hero,.announcement-rules,.announcement-registration { grid-template-columns:minmax(0,1fr); }
   .announcement h1 { max-width:24ch; }
   .announcement-registration { padding-inline:.3rem; }
-  .announcement-hero[data-locked] .announcement-copy { display:block; }
+  .announcement-hero[data-locked] { grid-template-columns:minmax(0,1fr); }
   .announcement-hero[data-locked] .announcement-dates { margin-top:.8rem; }
 }
 @media(max-width:34rem) {
