@@ -6,5 +6,5 @@
   "source_mode": "REVIEWED_PROJECTION",
   "state_format": "meshdraw-public-state-v2",
   "ui_contract": "meshdraw-web-v3",
-  "verification_format": "meshdraw-public-verification-v1"
+  "verification_format": "meshdraw-public-verification-v2"
 }
