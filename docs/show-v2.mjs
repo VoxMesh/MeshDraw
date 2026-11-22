@@ -243,12 +243,12 @@ function renderClock() {
   clock.hidden = !((waiting || registering) && remaining > 0);
   byId('show-clock-label').hidden = clock.hidden;
   if (!clock.hidden) {
-    setText('show-clock-label', registering ? 'До закрытия регистрации' : 'До запланированного чтения');
+    setText('show-clock-label', registering ? 'До закрытия регистрации' : 'До запланированного подведения итогов');
     const parts = [Math.floor(remaining / 3600), Math.floor(remaining / 60) % 60, remaining % 60];
     setText('show-countdown', parts.map(part => String(part).padStart(2, '0')).join(':'));
   }
   setText('show-clock-note', waiting
-    ? clock.hidden ? 'Ожидаем опубликованного обновления.' : 'Время по плану. Публикация результата может занять дольше.'
+    ? clock.hidden ? 'Ожидаем опубликованного обновления.' : 'Отсчёт по часам вашего устройства.'
     : state.phase === 'RUNNING' ? 'Получение радиоданных отмечено в опубликованном снимке.' : '');
   byId('show-stale').hidden = !stale;
 }
