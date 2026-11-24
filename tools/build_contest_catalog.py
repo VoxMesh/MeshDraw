@@ -11,9 +11,10 @@ import unicodedata
 PAGES = Path(__file__).resolve().parents[1] / 'docs'
 ARCHIVE_SLUG = '2026-11-22'
 ARCHIVE_CONTEST_ID = 'meshcore-1000-20261122'
-FIELDS = {'public_slug', 'title', 'prize', 'phase', 'date'}
+FIELDS = ('public_slug', 'title', 'prize', 'phase')
 PHASES = {'ANNOUNCED', 'OPEN', 'CLOSED', 'DRAWN', 'CANCELLED'}
-SLUG = re.compile(r'[0-9]{4}-[0-9]{2}-[0-9]{2}-[a-z0-9]+(?:-[a-z0-9]+)*')
+SLUG = re.compile(r'[a-z0-9]+(?:-[a-z0-9]+)*')
+DEVICE = re.compile(r'con|prn|aux|nul|com[0-9]|lpt[0-9]')
 DATE = re.compile(r'[0-9]{4}-[0-9]{2}-[0-9]{2}')
 
 
@@ -36,23 +37,24 @@ def display_text(value, limit):
 
 
 def validate_slug(value):
-    if value == ARCHIVE_SLUG:
-        return
-    if len(value) > 64 or not SLUG.fullmatch(value):
+    if not isinstance(value, str) or len(value) > 64 or not SLUG.fullmatch(value) or DEVICE.fullmatch(value):
         raise ValueError(f'Invalid public slug: {value}')
-    date.fromisoformat(value[:10])
 
 
 def validate_entry(entry, slug):
-    if not isinstance(entry, dict) or entry.keys() != FIELDS:
+    validate_slug(slug)
+    if not isinstance(entry, dict) or entry.keys() - {'date'} != set(FIELDS):
         raise ValueError(f'Invalid public catalog fields: {slug}')
     if (entry['public_slug'] != slug
             or not display_text(entry['title'], 150) or not display_text(entry['prize'], 160)
-            or not isinstance(entry['phase'], str) or entry['phase'] not in PHASES
-            or not isinstance(entry['date'], str) or not DATE.fullmatch(entry['date'])):
+            or not isinstance(entry['phase'], str) or entry['phase'] not in PHASES):
         raise ValueError(f'Invalid public catalog value: {slug}')
-    date.fromisoformat(entry['date'])
-    return entry
+    published_date = entry.get('date')
+    if published_date is not None:
+        if not isinstance(published_date, str) or not DATE.fullmatch(published_date):
+            raise ValueError(f'Invalid public catalog date: {slug}')
+        date.fromisoformat(published_date)
+    return {**{field: entry[field] for field in FIELDS}, 'date': published_date}
 
 
 def first_contest(folder):

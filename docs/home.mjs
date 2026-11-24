@@ -17,28 +17,36 @@ const displayDate = new Intl.DateTimeFormat('ru-RU', {
   day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC',
 });
 
-function hasOnlyKeys(value, keys) {
+function hasOnlyKeys(value, required, optional = []) {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
-    && Object.keys(value).length === keys.length
-    && keys.every((key) => Object.hasOwn(value, key));
+    && required.every((key) => Object.hasOwn(value, key))
+    && Object.keys(value).every((key) => required.includes(key) || optional.includes(key));
 }
 
 function isDisplayText(value, max) {
   return typeof value === 'string' && value.length > 0 && value.length <= max
-    && value === value.trim() && !/[\p{Cc}\p{Cf}]/u.test(value);
+    && value === value.trim() && !/[\p{Cc}\p{Cf}\p{Cs}]/u.test(value);
 }
 
 function isIsoDate(value) {
-  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value) || value.startsWith('0000-')) {
+    return false;
+  }
   const date = new Date(`${value}T00:00:00Z`);
   return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value;
 }
 
 function isPublicSlug(value) {
-  return value === archiveSlug
-    || (typeof value === 'string' && value.length <= 64 && value === value.trim()
-      && /^\d{4}-\d{2}-\d{2}-[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value)
-      && isIsoDate(value.slice(0, 10)));
+  return typeof value === 'string' && value.length <= 64 && value === value.trim()
+    && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value)
+    && !/^(?:con|prn|aux|nul|com[0-9]|lpt[0-9])$/.test(value);
+}
+
+function compareSchedule(a, b, newestFirst = false) {
+  if (a.date === b.date) return a.public_slug.localeCompare(b.public_slug);
+  if (a.date === null) return 1;
+  if (b.date === null) return -1;
+  return newestFirst ? b.date.localeCompare(a.date) : a.date.localeCompare(b.date);
 }
 
 export function parseContestCatalog(value) {
@@ -49,21 +57,21 @@ export function parseContestCatalog(value) {
   }
   const seen = new Set();
   const contests = value.contests.map((contest) => {
-    if (!hasOnlyKeys(contest, ['public_slug', 'title', 'prize', 'phase', 'date'])
+    if (!hasOnlyKeys(contest, ['public_slug', 'title', 'prize', 'phase'], ['date'])
         || !isPublicSlug(contest.public_slug)
         || seen.has(contest.public_slug) || !isDisplayText(contest.title, 150)
         || !isDisplayText(contest.prize, 160)
         || typeof contest.phase !== 'string' || !Object.hasOwn(phaseLabels, contest.phase)
-        || !isIsoDate(contest.date)) {
+        || (Object.hasOwn(contest, 'date') && contest.date !== null && !isIsoDate(contest.date))) {
       throw new Error('CATALOG_ENTRY');
     }
     seen.add(contest.public_slug);
-    return contest;
+    return { ...contest, date: contest.date ?? null };
   });
   const finished = (contest) => ['DRAWN', 'CANCELLED'].includes(contest.phase);
   return {
-    current: contests.filter((contest) => !finished(contest)).sort((a, b) => a.date.localeCompare(b.date)),
-    archived: contests.filter(finished).sort((a, b) => b.date.localeCompare(a.date)),
+    current: contests.filter((contest) => !finished(contest)).sort(compareSchedule),
+    archived: contests.filter(finished).sort((a, b) => compareSchedule(a, b, true)),
   };
 }
 
@@ -84,8 +92,12 @@ function renderContest(contest, archived) {
   article.querySelector('h3').textContent = contest.title;
   article.querySelector('.home-contest-prize').textContent = contest.prize;
   const date = article.querySelector('time');
-  date.dateTime = contest.date;
-  date.textContent = displayDate.format(new Date(`${contest.date}T00:00:00Z`));
+  if (contest.date === null) {
+    date.replaceWith(archived ? 'Дата не указана' : 'Дата уточняется');
+  } else {
+    date.dateTime = contest.date;
+    date.textContent = displayDate.format(new Date(`${contest.date}T00:00:00Z`));
+  }
   article.querySelector('.home-contest-meta span').textContent = phaseLabels[contest.phase];
   const link = article.querySelector('a');
   link.href = new URL(`./contests/${contest.public_slug}/`, import.meta.url);

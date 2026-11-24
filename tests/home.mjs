@@ -25,14 +25,34 @@ test('catalog groups public phases independently of a rescheduled contest date',
   });
 });
 
+test('organiser-selected slugs and unset dates work without a calendar prefix', () => {
+  const slugs = [
+    '2026-11-22', '2026-12-04-nelos-pro', '2026-12-nelos-pro',
+    '2026-nelos-pro', 'nelos-pro', 'nelos-pro-2',
+  ];
+  const entries = slugs.map((public_slug) => ({ ...upcoming, public_slug, date: null }));
+  delete entries.at(-1).date;
+  const scheduled = { ...upcoming, public_slug: 'example', date: '2027-02-16' };
+  const { current } = parseContestCatalog(catalog(...entries, scheduled));
+  assert.equal(current[0].public_slug, 'example');
+  assert.deepEqual(new Set(current.slice(1).map((entry) => entry.public_slug)), new Set(slugs));
+  assert.ok(current.slice(1).every((entry) => entry.date === null));
+});
+
 test('catalog rejects duplicate paths, invalid dates and unapproved fields', () => {
   assert.throws(() => parseContestCatalog(catalog(upcoming, upcoming)), /CATALOG_ENTRY/);
   for (const change of [
     { public_slug: '../2026-12-04-example' },
-    { public_slug: '2026-02-30-example' },
     { public_slug: '2026-12-04-example\n' },
-    { public_slug: '2026-12-04' },
+    { public_slug: 'nelos--pro' },
+    { public_slug: 'Nelos-pro' },
+    { public_slug: 'nelos%2fpro' },
+    { public_slug: 'lpt1' },
+    { public_slug: 'a'.repeat(65) },
     { date: '2026-13-01' },
+    { date: '2026-02-30' },
+    { date: '' },
+    { date: 0 },
     { contest_id: 'private-id' },
     { href: 'https://example.test/' },
     { phase: 'DRAFT' },
