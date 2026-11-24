@@ -30,14 +30,15 @@
   <main id="main" class="shell home" tabindex="-1">
     <section class="home-intro" aria-labelledby="home-title">
       <h1 id="home-title">Розыгрыши по радиоданным MeshCore</h1>
-      <p>По заранее опубликованным правилам и данным радиосети MeshDraw рассчитывает результат. Любой участник может повторить расчёт.</p>
-      <a class="home-cta" href="#contests">Смотреть конкурсы</a>
+      <p>MeshDraw рассчитывает результат по заранее опубликованным правилам и данным радиосети. Любой желающий может самостоятельно проверить результат.</p>
+      <a class="home-cta" id="home-cta" href="#archive">Смотреть архив</a>
     </section>
     <section class="home-section" id="contests" aria-labelledby="current-heading">
       <h2 id="current-heading">Текущие и предстоящие конкурсы</h2>
-      <p id="current-empty">Новые конкурсы появятся здесь после анонса.</p>
+      <p id="current-empty" hidden>Новые конкурсы появятся здесь после анонса.</p>
+      <p id="catalog-feedback" class="muted" role="status" hidden></p>
       <ul id="current-contests" class="home-contest-list" hidden></ul>
-      <p id="catalog-feedback" class="muted" role="status" hidden>Список обновить не удалось. Открыть первый конкурс можно в архиве.</p>
+      <noscript><p class="muted">Включите JavaScript, чтобы увидеть текущие конкурсы.</p></noscript>
     </section>
     <section class="home-section" id="archive" aria-labelledby="home-archive-heading">
       <h2 id="home-archive-heading">Архив конкурсов</h2>
@@ -55,6 +56,10 @@
           </article>
         </li>
       </ul>
+      <details id="older-archive" hidden>
+        <summary>Другие завершённые конкурсы</summary>
+        <ul id="older-contests" class="home-contest-list"></ul>
+      </details>
       <noscript><p id="verification"><a href="./contests/2026-11-22/#verification">Проверить результат первого конкурса</a></p></noscript>
     </section>
     <section class="home-section home-about" id="about" aria-labelledby="about-heading">

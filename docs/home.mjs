@@ -1,4 +1,5 @@
 const archiveSlug = '2026-11-22';
+const visibleArchiveEntries = 6;
 const phaseLabels = Object.freeze({
   ANNOUNCED: 'Анонсирован',
   OPEN: 'Приём заявок открыт',
@@ -102,6 +103,7 @@ function renderContest(contest, archived) {
   const link = article.querySelector('a');
   link.href = new URL(`./contests/${contest.public_slug}/`, import.meta.url);
   link.textContent = archived && contest.phase === 'DRAWN' ? 'Результат и проверка' : 'Страница конкурса';
+  link.setAttribute('aria-label', `${link.textContent} — ${contest.title}`);
   if (contest.public_slug === archiveSlug) {
     const image = document.createElement('img');
     image.className = 'home-contest-image';
@@ -117,8 +119,13 @@ function renderContest(contest, archived) {
 }
 
 async function mountCatalog() {
+  const feedback = document.getElementById('catalog-feedback');
+  feedback.textContent = 'Загружаем список конкурсов…';
+  feedback.hidden = false;
   try {
-    const response = await fetch(new URL('./contest-catalog.json', import.meta.url));
+    const response = await fetch(new URL('./contest-catalog.json', import.meta.url), {
+      credentials: 'omit', redirect: 'error', signal: AbortSignal.timeout(8_000),
+    });
     if (!response.ok) throw new Error('CATALOG_HTTP');
     const { current, archived } = parseContestCatalog(await response.json());
     if (!archived.some((contest) => contest.public_slug === archiveSlug && contest.phase === 'DRAWN')) {
@@ -129,10 +136,22 @@ async function mountCatalog() {
     currentList.hidden = current.length === 0;
     document.getElementById('current-empty').hidden = current.length !== 0;
     const archivedList = document.getElementById('archived-contests');
-    archivedList.replaceChildren(...archived.map((contest) => renderContest(contest, true)));
+    archivedList.replaceChildren(...archived.slice(0, visibleArchiveEntries).map((contest) => renderContest(contest, true)));
+    const older = archived.slice(visibleArchiveEntries);
+    if (older.length > 0) {
+      document.getElementById('older-contests').replaceChildren(...older.map((contest) => renderContest(contest, true)));
+      const olderArchive = document.getElementById('older-archive');
+      olderArchive.querySelector('summary').textContent = `Другие завершённые конкурсы (${older.length})`;
+      olderArchive.hidden = false;
+    }
+    if (current.length > 0) {
+      const cta = document.getElementById('home-cta');
+      cta.href = '#contests';
+      cta.textContent = current.every((contest) => contest.phase === 'ANNOUNCED') ? 'Смотреть анонсы' : 'Смотреть конкурсы';
+    }
+    feedback.hidden = true;
   } catch {
-    document.getElementById('current-empty').hidden = true;
-    document.getElementById('catalog-feedback').hidden = false;
+    feedback.textContent = 'Список обновить не удалось. Первый конкурс доступен в архиве.';
   }
 }
 

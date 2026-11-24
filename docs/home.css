@@ -3,7 +3,7 @@
   grid-template-columns: minmax(0, 1.35fr) minmax(15rem, .65fr);
   gap: 1.25rem clamp(2rem, 7vw, 6rem);
   align-items: end;
-  padding-block: clamp(2.25rem, 7vw, 6rem) clamp(2.75rem, 6vw, 5rem);
+  padding-block: clamp(1.5rem, 4vw, 4rem) clamp(1.75rem, 4vw, 3rem);
 }
 
 .home-intro h1 { max-width: 19ch; }
@@ -21,13 +21,21 @@
 
 .home-section {
   border-top: 1px solid var(--line);
-  padding-block: clamp(1.6rem, 4vw, 3rem);
+  padding-block: clamp(1.4rem, 3vw, 2.5rem);
 }
 
 .home-section p { max-width: 70ch; }
 #current-empty { color: var(--muted); }
 .home-contest-list { padding: 0; margin: 0; list-style: none; }
 .home-contest-list > li + li { margin-top: 1rem; }
+.home-contest:not(.home-contest--illustrated) {
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+}
+.home-contest:not(.home-contest--illustrated) .home-contest-content { padding: .7rem 0; }
+#older-archive > summary { padding-block: .65rem; }
 .home-contest {
   min-width: 0;
   border: 1px solid var(--line);
@@ -76,5 +84,6 @@
 
 @media (max-width: 46rem) {
   .home-intro, .home-contest--illustrated, .home-about { grid-template-columns: minmax(0, 1fr); }
+  .home-intro { row-gap: .85rem; }
   .home-contest-image { height: auto; aspect-ratio: 1672 / 941; }
 }
