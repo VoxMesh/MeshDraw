@@ -1,0 +1,80 @@
+.home-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(15rem, .65fr);
+  gap: 1.25rem clamp(2rem, 7vw, 6rem);
+  align-items: end;
+  padding-block: clamp(2.25rem, 7vw, 6rem) clamp(2.75rem, 6vw, 5rem);
+}
+
+.home-intro h1 { max-width: 19ch; }
+.home-intro p { max-width: 44ch; color: var(--muted); font-size: clamp(1rem, 1.35vw, 1.15rem); }
+.home-cta {
+  width: fit-content;
+  background: var(--accent);
+  color: #fff;
+  border-radius: .5rem;
+  padding: .75rem 1.25rem;
+  font-weight: 650;
+  text-decoration: none;
+}
+.home-cta:hover { background: var(--forest); }
+
+.home-section {
+  border-top: 1px solid var(--line);
+  padding-block: clamp(1.6rem, 4vw, 3rem);
+}
+
+.home-section p { max-width: 70ch; }
+#current-empty { color: var(--muted); }
+.home-contest-list { padding: 0; margin: 0; list-style: none; }
+.home-contest-list > li + li { margin-top: 1rem; }
+.home-contest {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: .9rem;
+  background: var(--surface);
+  overflow: hidden;
+}
+.home-contest--illustrated {
+  display: grid;
+  grid-template-columns: minmax(12rem, .75fr) minmax(0, 1.25fr);
+}
+.home-contest-image {
+  display: block;
+  width: 100%;
+  max-height: 19rem;
+  height: 100%;
+  object-fit: cover;
+}
+.home-contest-content { padding: clamp(1.25rem, 3.6vw, 2.75rem); }
+.home-contest-content h3 {
+  margin: 0 0 .5rem;
+  font: 500 clamp(1.4rem, 2.8vw, 2.2rem)/1.2 Georgia, 'Times New Roman', serif;
+  letter-spacing: -.02em;
+}
+.home-contest-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .25rem 1rem;
+  color: var(--muted);
+  font-size: .9rem;
+}
+.home-contest-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: .45rem;
+  font-weight: 650;
+}
+.home-about {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr);
+  gap: .85rem clamp(2rem, 5vw, 5rem);
+  align-items: end;
+}
+.home + .site-footer { border-top: 1px solid var(--line); }
+
+@media (max-width: 46rem) {
+  .home-intro, .home-contest--illustrated, .home-about { grid-template-columns: minmax(0, 1fr); }
+  .home-contest-image { height: auto; aspect-ratio: 1672 / 941; }
+}

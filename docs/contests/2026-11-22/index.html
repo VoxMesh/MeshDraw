@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="meshdraw-ui-contract" content="meshdraw-web-v3">
+  <meta name="meshdraw-announcement" content="announcement.json">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta name="referrer" content="no-referrer">
+  <meta name="description" content="MeshDraw — открытая платформа проверяемых вычислений по радиоданным сети MeshCore.">
+  <title>MeshDraw</title>
+  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./show-v2.css">
+  <script type="module" src="./show-v2.mjs"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">К содержанию</a>
+  <header class="site-header shell">
+    <div class="site-brand">
+      <a class="brand" href="#main" aria-label="MeshDraw — к началу страницы">
+        <svg viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M16 6v20M8 11l8-5 8 5M8 21l8 5 8-5M8 11v10m16-10v10M8 11l16 10M24 11 8 21"/><circle cx="16" cy="16" r="3" fill="currentColor" stroke="none"/></svg>
+        <span>Mesh<wbr>Draw</span>
+      </a>
+      <p class="brand-subtitle">Открытая платформа проверяемых вычислений</p>
+    </div>
+    <nav aria-label="По странице"><a id="rules-link" href="#rules-section" hidden>Условия</a><a id="tickets-link" href="#tickets-section" hidden>Билеты</a><a href="#verification">Проверка</a><a href="#method">О MeshDraw</a></nav>
+  </header>
+  <main id="main" class="shell" tabindex="-1" aria-busy="true">
+    <p id="state-feedback" class="status" role="status" data-tone="loading">Загружаем состояние конкурса…</p>
+    <p id="synthetic-banner" class="synthetic" hidden><strong>Демонстрация MeshDraw.</strong> Счётчик, билеты и результат учебные (SYNTHETIC).</p>
+    <section id="prelaunch" class="prelaunch" aria-labelledby="prelaunch-heading" hidden>
+      <h1 id="prelaunch-heading">
+        <span id="announcement-title">Конкурс MeshDraw</span>
+        <span id="announcement-title-channel-line" class="announcement-title-channel" hidden>канала „<a id="announcement-title-channel" rel="noreferrer"></a>“</span>
+      </h1>
+      <p id="prelaunch-summary">Сведения о конкурсе пока недоступны.</p>
+      <div class="announcement-hero" id="announcement-content" data-registration-closed="true" hidden>
+        <div id="announcement-copy" class="announcement-copy">
+          <p class="status announcement-status" id="announcement-status" role="status"></p>
+          <p class="announcement-prize"><strong id="announcement-prize-title"></strong></p>
+          <dl class="announcement-dates">
+            <div>
+              <dt>Приём заявок</dt>
+              <dd><strong>Завершён</strong><time id="announcement-cutoff"></time></dd>
+            </div>
+            <div>
+              <dt>Подведение итогов</dt>
+              <dd><time id="announcement-ceremony"></time></dd>
+            </div>
+          </dl>
+          <p id="announcement-preparation" class="announcement-preparation" role="status" hidden>Идёт проверка заявок и подготовка списка билетов</p>
+          <div id="announcement-clock" class="announcement-clock" hidden>
+            <p id="announcement-clock-label" class="announcement-clock-label" role="status"></p>
+            <p id="announcement-countdown" class="announcement-countdown" role="timer" aria-live="off" aria-labelledby="announcement-clock-label" aria-describedby="announcement-clock-note" hidden></p>
+            <p id="announcement-clock-note" class="announcement-clock-note">По часам вашего устройства.</p>
+          </div>
+          <div class="announcement-actions">
+            <a class="announcement-cta" id="announcement-cta" rel="noreferrer" hidden></a>
+            <a id="announcement-rules-link" rel="noreferrer"></a>
+          </div>
+        </div>
+        <div class="announcement-media">
+          <img id="announcement-prize-image" class="announcement-prize-image" alt="" decoding="async" hidden>
+          <p class="announcement-sponsor"><span id="announcement-sponsor"></span> <a id="announcement-sponsor-link" href="https://73lab.ru/" rel="noreferrer">73lab.ru</a></p>
+        </div>
+      </div>
+      <div id="announcement-registration" class="announcement-registration" hidden>
+        <div>
+          <p id="announcement-meta" data-preliminary-count="102" data-preliminary-at="2026-11-21T19:17:56Z">Официальный снимок регистрации пока недоступен.</p>
+          <p id="announcement-updated" class="muted" hidden>Обновлено <time id="announcement-snapshot"></time></p>
+          <p id="announcement-stale" class="muted" hidden>После этого снимка число заявок могло измениться.</p>
+        </div>
+        <p id="announcement-list-note" class="muted">Окончательный список номеров билетов появится после фиксации.</p>
+      </div>
+    </section>
+    <div class="refresh-line">
+      <button id="refresh-state" class="refresh-button" type="button">Проверить обновление</button>
+      <p id="refresh-feedback" class="refresh-feedback" role="status"></p>
+    </div>
+    <p id="show-announcement" class="show-sr" role="status" aria-atomic="true"></p>
+    <div id="contest-view" hidden>
+      <div class="show-heading">
+        <h1 id="contest-title">Конкурс MeshDraw</h1>
+        <p id="contest-state" class="status" role="status" data-tone="loading">Загружаем конкурс…</p>
+      </div>
+      <section id="show-stage" class="show-stage" aria-labelledby="result-heading" hidden>
+        <div class="show-display">
+          <h2 id="result-heading">Розыгрыш MeshDraw</h2>
+          <p class="show-admitted"><span id="show-count-label">Допущено билетов</span> <strong id="show-ticket-count">—</strong></p>
+          <p id="show-updated" class="show-updated"></p>
+          <p id="show-list-note" class="show-clock-note" hidden>Окончательный список номеров билетов появится после фиксации.</p>
+          <p id="show-stale" class="show-clock-note" hidden>Данные могут быть устаревшими.</p>
+          <p id="show-clock-label" class="show-clock-label" hidden>До запланированного подведения итогов</p>
+          <p id="show-countdown" class="show-countdown" role="timer" aria-live="off" hidden></p>
+          <p id="show-clock-note" class="show-clock-note" role="status"></p>
+          <div id="show-result" class="show-result">
+            <p id="show-mask" class="show-mask" hidden>Билет № ****</p>
+            <p id="winner-label" class="winner-label" hidden>Билет победителя</p>
+            <p id="saved-result" class="winner" tabindex="-1" hidden></p>
+            <p id="result-note" class="result-note">Победивший билет появится после проверки опубликованного пакета.</p>
+            <details id="reserve-order" hidden>
+              <summary class="show-link">Очередь резервных билетов</summary>
+              <ol id="reserve-list"></ol>
+            </details>
+          </div>
+          <div id="reveal-controls" class="reveal-controls" hidden>
+            <button id="pause-reveal" type="button">Пауза</button>
+            <button id="skip-reveal" type="button">Пропустить анимацию</button>
+          </div>
+          <div class="show-links">
+            <a class="show-link" href="#verification">Проверить расчёт <span aria-hidden="true">↓</span></a>
+            <a id="show-plan-link" class="show-link" href="#archive-section">План и хеш</a>
+          </div>
+        </div>
+        <div class="show-network">
+          <figure>
+          <svg class="show-network-svg" viewBox="0 0 460 270" width="460" height="270" fill="none" aria-hidden="true">
+            <path class="show-network-guide" d="M12 40h436M12 92h436M12 144h436M12 196h436M12 248h436M48 16v244m72-244v244m72-244v244m72-244v244m72-244v244m72-244v244"/>
+            <path class="show-network-links" d="M47 194l68-89 68 116m-68-116 97 45-29 71m-68-116 91-64 6 109 88-58-94-51m6 109 118 75-30-133 111 45-81 88m-30-133 99-58 12 103"/>
+            <path class="show-network-signal" d="M47 194l68-89 97 45 88-58 111 45"/>
+            <g class="show-network-waves"><circle cx="212" cy="150" r="34"/><circle cx="212" cy="150" r="61"/><circle cx="212" cy="150" r="92"/></g>
+            <g class="show-network-nodes">
+              <circle cx="47" cy="194" r="4"/><circle cx="115" cy="105" r="5"/><circle cx="183" cy="221" r="4"/>
+              <circle cx="206" cy="41" r="4"/><circle cx="212" cy="150" r="8"/><circle cx="300" cy="92" r="5"/>
+              <circle cx="330" cy="225" r="4"/><circle cx="399" cy="34" r="4"/><circle cx="411" cy="137" r="5"/>
+            </g>
+          </svg>
+          </figure>
+          <div id="show-rf" class="show-rf" hidden>
+            <p id="show-rf-summary"></p>
+            <svg viewBox="0 0 240 48" width="240" height="48" fill="none" aria-hidden="true">
+              <path d="M0 12h240M0 36h240" class="show-network-guide"/>
+              <polyline id="show-rf-trace" class="show-network-signal" pathLength="1" stroke-dasharray="1"/>
+            </svg>
+            <p id="show-rf-caption"></p>
+          </div>
+        </div>
+      </section>
+
+      <div class="contest-content">
+        <section id="rules-section" class="rules-section" aria-labelledby="rules-heading">
+          <h2 id="rules-heading">Условия участия</h2>
+          <p id="prize" class="prize" hidden></p>
+          <p id="rules" class="rules">Условия пока не загружены.</p>
+          <dl class="dates">
+            <div><dt>Начало приёма</dt><dd id="opens-at">—</dd></div>
+            <div><dt>Приём до <span class="muted">(не включая границу)</span></dt><dd id="cutoff-at">—</dd></div>
+          </dl>
+        </section>
+        <section id="tickets-section" class="tickets-section" aria-labelledby="tickets-heading" hidden>
+          <h2 id="tickets-heading">Зафиксированные билеты <span id="ticket-count" class="ticket-count"></span></h2>
+          <details id="ticket-details"><summary>Посмотреть номера билетов</summary><ul id="tickets" class="tickets" tabindex="0" aria-label="Опубликованные номера билетов"></ul></details>
+        </section>
+        <section id="archive-section" hidden aria-labelledby="archive-heading">
+          <h2 id="archive-heading">План розыгрыша</h2>
+          <dl class="archive-plan">
+            <div><dt>Запланированное чтение источника</dt><dd id="archive-read-at">—</dd></div>
+            <div><dt>Архивный интервал</dt><dd id="archive-window">—</dd></div>
+            <div><dt>Контрольная сумма плана (SHA-256)</dt><dd><code id="plan-hash">—</code></dd></div>
+          </dl>
+        </section>
+      </div>
+    </div>
+    <section id="announcement-rules" class="announcement-rules" aria-labelledby="announcement-rules-title" hidden>
+      <h2 id="announcement-rules-title">Условия участия</h2>
+      <div>
+        <p><a id="announcement-full-rules" rel="noreferrer"></a></p>
+      </div>
+    </section>
+    <section id="verification" class="verification" aria-labelledby="verification-heading">
+      <div class="verification-intro">
+        <h2 id="verification-heading">Проверьте результат самостоятельно</h2>
+        <p id="verification-note">После публикации итогов вы можете повторить расчёт прямо в вашем браузере и сверить его с опубликованным результатом.</p>
+        <p><a id="verification-source" href="https://github.com/VoxMesh/meshdraw" rel="noreferrer">Открытый код верификатора</a> доступен для независимой проверки.</p>
+      </div>
+      <div id="verification-action" class="verification-action" hidden>
+        <button id="recalculate" type="button" disabled hidden aria-describedby="verification-note">Пересчитать в браузере</button>
+        <p id="verification-links" hidden><a id="download-verification" download="verification.json">Скачать данные для проверки</a></p>
+        <p id="verification-status" class="verification-status" role="status" aria-live="polite" aria-atomic="true">Проверка ещё не выполнена.</p>
+      </div>
+      <details id="calculation-details" class="technical-details" hidden>
+        <summary>Технические подробности</summary>
+        <div class="technical-body">
+          <p class="muted">Профиль archive-input-v1 задаёт отбор наблюдений из снимка архива Comchan. После исключения повторов и нормализации RSSI и SNR вычисляются SHA-256 и индекс в зафиксированном списке билетов.</p>
+          <p id="steps-note" class="muted">После пересчёта здесь появятся выбранные записи, RF-байты, хеш и индекс билета.</p>
+          <pre id="calculation-output" hidden tabindex="0" aria-label="Шаги и значения пересчёта"></pre>
+          <div class="downloads">
+            <p><a href="./result.json" download>Скачать состояние конкурса (JSON)</a></p>
+          </div>
+        </div>
+      </details>
+    </section>
+    <section id="method" class="method" aria-labelledby="method-heading">
+      <h2 id="method-heading">Как работает MeshDraw</h2>
+      <p class="method-intro">MeshDraw — открытая платформа, которая использует реальные измерения радиосети MeshCore для вычисления публично проверяемых результатов.</p>
+      <p class="method-link"><a href="https://t.me/MeshCore_offline_network/201" rel="noreferrer">История MeshDraw: „Эфир выбирает победителя“</a></p>
+      <h3>Откуда берутся данные?</h3>
+      <p class="method-intro">Устройства-наблюдатели принимают пакеты MeshCore и измеряют уровень сигнала (RSSI, в дБм) и отношение сигнала к шуму (SNR, в дБ). Наблюдатели передают эти записи сервисам мониторинга. На первом этапе источником радиоданных служит архив сервиса Comchan.</p>
+      <h3>Как определяется результат?</h3>
+      <ol class="method-steps">
+        <li><strong>План</strong><p>Заранее фиксируют источник, временной интервал, правила вычисления и список допустимых результатов.</p></li>
+        <li><strong>Отбор</strong><p>Профиль archive-input-v1 проверяет наблюдения за выбранный интервал и исключает повторы одной передачи у одного наблюдателя.</p></li>
+        <li><strong>Нормализация</strong><p>Пары RSSI и SNR приводят к единому числовому формату и упорядочивают по правилам профиля.</p></li>
+        <li><strong>Единый расчёт</strong><p>Из подготовленных данных вычисляют цифровой отпечаток SHA‑256. Алгоритм преобразует его в один из допустимых результатов, например в номер выигравшего билета.</p></li>
+        <li><strong>Проверка</strong><p>MeshDraw публикует результат и проверочные данные. Вы можете повторить вычисление прямо в вашем браузере.</p></li>
+      </ol>
+      <h3>Зачем создан MeshDraw?</h3>
+      <p class="method-intro">Идея проекта — использовать реальные события радиосети для открытых, воспроизводимых вычислений. При одинаковых исходных данных и правилах алгоритм получает один и тот же результат.</p>
+      <p class="method-link"><a id="method-docs" href="https://github.com/VoxMesh/meshdraw#методика" rel="noreferrer">Техническая методика</a></p>
+    </section>
+    <noscript><p class="error">Включите JavaScript, чтобы увидеть состояние конкурса и воспользоваться пересчётом.</p></noscript>
+  </main>
+  <footer class="site-footer shell"><span class="footer-brand">Проект Vox (<a href="https://github.com/VoxMesh" rel="noreferrer">@VoxMesh</a>)</span><a href="https://github.com/VoxMesh/meshdraw" rel="noreferrer">Публичный код MeshDraw на GitHub</a><a href="#main">К началу страницы ↑</a></footer>
+</body>
+</html>

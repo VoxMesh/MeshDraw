@@ -1,0 +1,12 @@
+{
+  "schema_version": "meshdraw-contest-catalog-v1",
+  "contests": [
+    {
+      "public_slug": "2026-11-22",
+      "title": "Розыгрыш в честь 1000 подписчиков",
+      "prize": "Антенна Антэкс AX-865-14Y",
+      "phase": "DRAWN",
+      "date": "2026-11-22"
+    }
+  ]
+}

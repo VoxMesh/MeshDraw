@@ -1,0 +1,25 @@
+{
+  "schema_version": "meshdraw-announcement-v1",
+  "title": "Розыгрыш в честь 1000 подписчиков",
+  "channel": "MeshCore — связь без интернета",
+  "open_status": "Приём заявок открыт",
+  "closed_status": "Приём заявок завершён",
+  "prize": "Антенна Антэкс AX-865-14Y",
+  "prize_image": {
+    "src": "assets/ax-865-14y.webp",
+    "alt": "Антенна Яги Антэкс AX-865-14Y на опоре",
+    "width": 1672,
+    "height": 941
+  },
+  "sponsor": "Приз предоставлен магазином",
+  "cutoff_at": "2026-11-21T17:00:00Z",
+  "ceremony_at": "2026-11-22T16:00:00Z",
+  "cta": "Участвовать в Telegram",
+  "post_url": "https://t.me/MeshCore_offline_network/199",
+  "rules_label": "Правила в Telegram",
+  "rules_url": "https://t.me/MeshCore_offline_network/200",
+  "participation": "Подпишитесь на Telegram-канал «MeshCore — связь без интернета», оставьте прямой комментарий «Хочу антенну!» или «Участвую» под постом о розыгрыше и дождитесь подтверждения заявки.",
+  "conditions": [
+    "Участие бесплатное. Один аккаунт — одна заявка."
+  ]
+}
