@@ -1,0 +1,9 @@
+[
+  {"name":"empty", "size":0, "policy":"AWARD_ALL", "status":"NO_DRAW", "order":[]},
+  {"name":"one award", "size":1, "policy":"AWARD_ALL", "status":"AWARD_ALL", "order":["0001"]},
+  {"name":"nine awards", "size":9, "policy":"AWARD_ALL", "status":"AWARD_ALL", "order":["0001","0002","0003","0004","0005","0006","0007","0008","0009"]},
+  {"name":"nine tickets with no-draw rule", "size":9, "policy":"NO_DRAW", "status":"NO_DRAW", "order":[]},
+  {"name":"ten awards without RF", "size":10, "policy":"AWARD_ALL", "status":"AWARD_ALL", "order":["0001","0002","0003","0004","0005","0006","0007","0008","0009","0010"]},
+  {"name":"ten awards with RF", "size":10, "policy":"NO_DRAW", "status":"DRAWN", "order":["0002","0003","0004","0001","0010","0006","0005","0007","0008","0009"]},
+  {"name":"ten winners and three reserves", "size":13, "policy":"AWARD_ALL", "status":"DRAWN", "order":["0013","0003","0004","0001","0011","0010","0006","0002","0012","0005","0007","0008","0009"]}
+]
