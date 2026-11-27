@@ -47,16 +47,46 @@
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(0, .9fr);
   column-gap: clamp(2rem, 5vw, 5rem);
+  row-gap: 1.5rem;
   align-items: start;
 }
 
-.nelos-features, .nelos-rules ol { padding-inline-start: 1.35rem; }
-.nelos-features li + li, .nelos-rules li + li { margin-top: .65rem; }
+.nelos-rules ol { padding-inline-start: 1.35rem; }
+.nelos-rules li + li { margin-top: .65rem; }
 .nelos-hardware { background: var(--hint); padding: .9rem 1rem; border-radius: .65rem; }
 .nelos-product-links { display: flex; flex-wrap: wrap; gap: .25rem 1.4rem; }
 .nelos-product-links a { display: inline-flex; align-items: center; min-height: 44px; }
 
-.nelos-gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(.7rem, 2vw, 1.25rem); }
+.nelos-comparison { grid-column: 1 / -1; min-width: 0; }
+.nelos-comparison table {
+  width: 100%;
+  table-layout: fixed;
+  border: 1px solid var(--line);
+  border-collapse: collapse;
+  background: var(--surface);
+  line-height: 1.4;
+}
+.nelos-comparison caption {
+  margin-bottom: .75rem;
+  text-align: start;
+  font-weight: 650;
+}
+.nelos-comparison-feature { width: 52%; }
+.nelos-comparison-pro { background: var(--mint); }
+.nelos-comparison th,
+.nelos-comparison td {
+  padding: .6rem clamp(.45rem, 1.6vw, 1rem);
+  border-bottom: 1px solid var(--line);
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+.nelos-comparison th:first-child { text-align: start; }
+.nelos-comparison thead th { background: var(--hint); }
+.nelos-comparison thead th:last-child { background: var(--forest); color: var(--surface); }
+.nelos-comparison tbody th { font-weight: 550; }
+.nelos-comparison p { margin-top: .7rem; color: var(--muted); }
+
+.nelos-gallery { grid-column: 2; grid-row: 1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(.7rem, 2vw, 1.25rem); }
 .nelos-gallery img { display: block; width: 100%; height: auto; border-radius: .65rem; }
 .nelos-attribution { grid-column: 1 / -1; margin: 0; color: var(--muted); font-size: .95rem; }
 .nelos-proof .result-panel h2 { margin-bottom: .85rem; }
@@ -66,12 +96,23 @@
 .nelos-rules ol { max-width: 70ch; }
 
 @media (max-width: 55rem) {
-  .nelos-prize { grid-template-columns: 1fr; row-gap: 1.5rem; }
-  .nelos-gallery { width: min(100%, 29rem); }
+  .nelos-prize { grid-template-columns: minmax(0, 1fr); }
+  .nelos-gallery { grid-column: auto; grid-row: auto; width: min(100%, 29rem); }
 }
 
 @media (max-width: 32rem) {
   .nelos-hero h1 { font-size: clamp(2rem, 9vw, 2.5rem); }
   .nelos-hero .prize { font-size: 1.05rem; margin-top: 1rem; }
   .nelos-entry { margin-top: 1.25rem; }
+  .nelos-comparison table { font-size: .875rem; }
+  .nelos-comparison-feature { width: 44%; }
+  .nelos-comparison-pro { width: 30%; }
+  .nelos-comparison th, .nelos-comparison td { padding-inline: .35rem; }
+}
+
+@media (max-width: 22rem) {
+  .nelos-comparison table { width: calc(100% + 1rem); margin-inline: -.5rem; font-size: .8125rem; }
+  .nelos-comparison caption { padding-inline: .5rem; font-size: .875rem; }
+  .nelos-comparison-pro { width: 29%; }
+  .nelos-comparison th, .nelos-comparison td { padding-inline: .2rem; }
 }
