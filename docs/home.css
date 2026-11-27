@@ -87,3 +87,11 @@
   .home-intro { row-gap: .85rem; }
   .home-contest-image { height: auto; aspect-ratio: 1672 / 941; }
 }
+
+.home-contest-image--nelos {
+  align-self: center;
+  height: auto;
+  max-height: none;
+  aspect-ratio: 1200 / 630;
+  object-fit: contain;
+}

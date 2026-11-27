@@ -1,4 +1,17 @@
 const archiveSlug = '2026-11-22';
+const contestImages = new Map([
+  [archiveSlug, {
+    className: 'home-contest-image',
+    src: './contests/2026-11-22/assets/ax-865-14y.webp',
+    width: 1672, height: 941, alt: 'Антенна Яги Антэкс AX-865-14Y на опоре',
+  }],
+  ['nelos-pro', {
+    className: 'home-contest-image home-contest-image--nelos',
+    src: './contests/nelos-pro/assets/nelos-hero.webp',
+    width: 1200, height: 630,
+    alt: 'Nelos показывает участников похода на карте и связывает их через радиоустройство',
+  }],
+]);
 const visibleArchiveEntries = 6;
 const phaseLabels = Object.freeze({
   ANNOUNCED: 'Анонсирован',
@@ -104,13 +117,14 @@ function renderContest(contest, archived) {
   link.href = new URL(`./contests/${contest.public_slug}/`, import.meta.url);
   link.textContent = archived && contest.phase === 'DRAWN' ? 'Результат и проверка' : 'Страница конкурса';
   link.setAttribute('aria-label', `${link.textContent} — ${contest.title}`);
-  if (contest.public_slug === archiveSlug) {
+  const illustration = contestImages.get(contest.public_slug);
+  if (illustration) {
     const image = document.createElement('img');
-    image.className = 'home-contest-image';
-    image.src = new URL('./contests/2026-11-22/assets/ax-865-14y.webp', import.meta.url);
-    image.width = 1672;
-    image.height = 941;
-    image.alt = 'Антенна Яги Антэкс AX-865-14Y на опоре';
+    image.className = illustration.className;
+    image.src = new URL(illustration.src, import.meta.url);
+    image.width = illustration.width;
+    image.height = illustration.height;
+    image.alt = illustration.alt;
     image.decoding = 'async';
     article.classList.add('home-contest--illustrated');
     article.prepend(image);
